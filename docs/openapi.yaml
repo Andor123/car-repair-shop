@@ -1,0 +1,1669 @@
+openapi: 3.0.3
+info:
+  title: Car Repair Shop API
+  description: REST API for Car Repair Shop Management System.
+  version: 1.0.0
+  license:
+    name: MIT
+servers:
+  - url: http://localhost/car-repair-shop/public/api
+tags:
+  - name: Authentication
+  - name: Vehicles
+  - name: Appointments
+  - name: Repair Orders
+  - name: Employees
+  - name: Parts
+  - name: Services
+  - name: Repair Order Parts
+  - name: Repair Order Services
+  - name: Invoices
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+
+    # Generic responses
+
+    ApiResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        message:
+          type: string
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          example: 404
+        message:
+          type: string
+          example: Resource not found
+
+    # Authentication
+
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+        - first_name
+        - last_name
+        - phone
+        - address
+      properties:
+        username:
+          type: string
+          example: amalia1
+        email:
+          type: string
+          example: amalia@gmail.com
+        password:
+          type: string
+          example: Amalia123
+        first_name:
+          type: string
+          example: Amalia
+        last_name:
+          type: string
+          example: Nemeth
+        phone:
+          type: string
+          example: "+36702578452"
+        address:
+          type: string
+          example: Makó
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: admin@gmail.com
+        password:
+          type: string
+          example: Admin-123
+    ForgotPasswordRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          type: string
+          example: salamon.andor@gmail.com
+    ResetPasswordRequest:
+      type: object
+      required:
+        - token
+        - new_password
+      properties:
+        token:
+          type: string
+          example: 24a3fb5756965c7e20ce0a0096802270222095f20ea25af0e784eaaf418d6f51
+        new_password:
+          type: string
+          example: Ame456
+
+    # Vehicles
+
+    Vehicle:
+      type: object
+      properties:
+        vehicle_id:
+          type: integer
+          example: 13
+        customer_id:
+          type: integer
+          example: 9
+        license_plate:
+          type: string
+          example: SU085-HF
+        vin:
+          type: string
+          example: OGPISK4842454
+        brand:
+          type: string
+          example: Opel
+        model:
+          type: string
+          example: Meriva
+        year:
+          type: string
+          example: "2009"
+        engine_type:
+          type: string
+          example: petrol
+        mileage:
+          type: integer
+          example: 100000
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-06-23T10:31:09Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-06-23T10:31:09Z"
+    VehicleRequest:
+      type: object
+      required:
+        - license_plate
+        - vin
+        - brand
+        - model
+        - year
+        - engine_type
+        - mileage
+      properties:
+        license_plate:
+          type: string
+          example: SU085-HF
+        vin:
+          type: string
+          example: OGPISK4842454
+        brand:
+          type: string
+          example: Opel
+        model:
+          type: string
+          example: Meriva
+        year:
+          type: integer
+          example: 2009
+        engine_type:
+          type: string
+          example: petrol
+        mileage:
+          type: integer
+          example: 100000
+
+    # Appointments
+
+    Appointment:
+      type: object
+      properties:
+        appointment_id:
+          type: integer
+          example: 4
+        vehicle_id:
+          type: integer
+          example: 14
+        appointment_date:
+          type: string
+          format: date-time
+          example: "2026-06-23T11:00:00Z"
+        problem_description:
+          type: string
+          example: Gearbox change
+        status:
+          type: string
+          enum:
+            - scheduled
+            - in_progress
+            - completed
+            - cancelled
+          example: scheduled
+    AppointmentRequest:
+      type: object
+      required:
+        - vehicle_id
+        - appointment_date
+        - problem_description
+      properties:
+        vehicle_id:
+          type: integer
+          example: 14
+        appointment_date:
+          type: string
+          format: date-time
+          example: "2026-06-23T11:00:00Z"
+        problem_description:
+          type: string
+          example: Gearbox change
+    AppointmentStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - scheduled
+            - in_progress
+            - completed
+            - cancelled
+          example: in_progress
+
+    # Repair Orders
+
+    RepairOrder:
+      type: object
+      properties:
+        repair_order_id:
+          type: integer
+          example: 2
+        appointment_id:
+          type: integer
+          example: 1
+        employee_id:
+          type: integer
+          example: 1
+        start_date:
+          type: string
+          format: date-time
+          example: "2026-06-17T09:00:00Z"
+        end_date:
+          type: string
+          format: date-time
+          nullable: true
+          example: null
+        status:
+          type: string
+          enum:
+            - reported
+            - in progress
+            - completed
+          example: in progress
+        total_labor_cost:
+          type: string
+          example: "120.00"
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-06-17T14:58:11Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-06-17T15:01:07Z"
+    RepairOrderRequest:
+      type: object
+      required:
+        - appointment_id
+        - employee_id
+        - start_date
+        - total_labor_cost
+      properties:
+        appointment_id:
+          type: integer
+          example: 10
+        employee_id:
+          type: integer
+          example: 10
+        start_date:
+          type: string
+          format: date-time
+          example: "2026-06-25T13:00:00Z"
+        total_labor_cost:
+          type: number
+          format: float
+          example: 100.00
+    RepairOrderStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - reported
+            - in progress
+            - completed
+          example: in progress
+
+    # Employees
+
+    Employee:
+      type: object
+      properties:
+        employee_id:
+          type: integer
+          example: 1
+        first_name:
+          type: string
+          example: Peter
+        last_name:
+          type: string
+          example: Kovacs
+        phone:
+          type: string
+          example: "+381601234567"
+        email:
+          type: string
+          example: peter123@example.com
+        role_name:
+          type: string
+          example: mechanic
+    EmployeeRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+        - role_id
+        - first_name
+        - last_name
+        - phone
+      properties:
+        username:
+          type: string
+          example: zsuzsi158
+        email:
+          type: string
+          example: zsuzsi@gmail.com
+        password:
+          type: string
+          example: Zsuzsi158
+        role_id:
+          type: integer
+          example: 3
+        first_name:
+          type: string
+          example: Zsuzsi
+        last_name:
+          type: string
+          example: Mate
+        phone:
+          type: string
+          example: "+381638452147"
+    EmployeeUpdateRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+        - role
+        - first_name
+        - last_name
+        - phone
+      properties:
+        username:
+          type: string
+          example: tamas444
+        email:
+          type: string
+          example: tamas@ygmail.com
+        password:
+          type: string
+          example: Tamas123
+        role:
+          type: string
+          example: mechanic
+        first_name:
+          type: string
+          example: Tamas
+        last_name:
+          type: string
+          example: Molnar
+        phone:
+          type: string
+          example: "+36305784526"
+
+    # Parts
+
+    Part:
+      type: object
+      properties:
+        part_id:
+          type: integer
+          example: 1
+        part_name:
+          type: string
+          example: Premium Oil Filter
+        part_number:
+          type: string
+          example: OF-001
+        stock_quantity:
+          type: integer
+          example: 43
+        unit_price:
+          type: string
+          example: "18.99"
+    PartRequest:
+      type: object
+      required:
+        - part_name
+        - part_number
+        - stock_quantity
+        - unit_price
+      properties:
+        part_name:
+          type: string
+          example: Michelin Tire
+        part_number:
+          type: string
+          example: MH-001
+        stock_quantity:
+          type: integer
+          example: 80
+        unit_price:
+          type: number
+          format: float
+          example: 30.99
+
+    # Services
+
+    Service:
+      type: object
+      properties:
+        service_id:
+          type: integer
+          example: 1
+        service_name:
+          type: string
+          example: Premium Oil Change
+        base_price:
+          type: string
+          example: "79.99"
+    ServiceRequest:
+      type: object
+      required:
+        - service_name
+        - base_price
+      properties:
+        service_name:
+          type: string
+          example: Tire Change
+        base_price:
+          type: number
+          format: float
+          example: 69.99
+
+    # Repair Order Parts
+
+    RepairOrderPart:
+      type: object
+      properties:
+        part_name:
+          type: string
+          example: Michelin Tire
+        quantity:
+          type: integer
+          example: 6
+        unit_price:
+          type: string
+          example: "30.99"
+    RepairOrderPartRequest:
+      type: object
+      required:
+        - repair_order_id
+        - part_id
+        - quantity
+      properties:
+        repair_order_id:
+          type: integer
+          example: 5
+        part_id:
+          type: integer
+          example: 6
+        quantity:
+          type: integer
+          example: 6
+
+    # Repair Order Services
+
+    RepairOrderService:
+      type: object
+      properties:
+        service_name:
+          type: string
+          example: Tire Change
+        quantity:
+          type: integer
+          example: 6
+        price:
+          type: string
+          example: "69.99"
+    RepairOrderServiceRequest:
+      type: object
+      required:
+        - repair_order_id
+        - service_id
+        - quantity
+      properties:
+        repair_order_id:
+          type: integer
+          example: 5
+        service_id:
+          type: integer
+          example: 6
+        quantity:
+          type: integer
+          example: 6
+
+    # Invoices
+
+    Invoice:
+      type: object
+      properties:
+        invoice_id:
+          type: integer
+          example: 4
+        repair_order_id:
+          type: integer
+          example: 5
+        invoice_date:
+          type: string
+          format: date-time
+          example: "2026-06-23T12:10:53Z"
+        total_amount:
+          type: string
+          example: "705.88"
+        payment_method:
+          type: string
+          enum:
+            - cash
+            - credit card
+          example: credit card
+        status:
+          type: string
+          enum:
+            - pending
+            - paid
+            - cancelled
+          example: pending
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-06-23T12:10:53Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-06-23T12:10:53Z"
+    InvoiceRequest:
+      type: object
+      required:
+        - repair_order_id
+        - payment_method
+      properties:
+        repair_order_id:
+          type: integer
+          example: 5
+        payment_method:
+          type: string
+          enum:
+            - cash
+            - credit card
+          example: credit card
+    InvoiceStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - pending
+            - paid
+            - cancelled
+          example: paid
+security:
+  - bearerAuth: []
+paths:
+
+  # Authentication
+
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        "201":
+          description: Registration successful
+          content:
+            application/json:
+              example:
+                status: 201
+                message: Registration successful
+        "400":
+          description: Validation error
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticates the user and returns a JWT token.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Login successful
+                data: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJjYXJfcmVwYWlyX2FwaSIsImlhdCI6MTc4MjE0MzU5NSwiZXhwIjoxNzgyMTQ3MTk1LCJ1c2VyX2lkIjoxNiwicm9sZV9pZCI6NSwic2Vzc2lvbl9pZCI6MzV9.rAc8fVPFwYf0oo2FWzsIo4HINjxM_eq4n--96sY73d4
+        "401":
+          description: Invalid credentials
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout user
+      responses:
+        "200":
+          description: Logged out successfully
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Logged out successfully
+        "401":
+          description: Invalid JWT token
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Send password reset email
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        "200":
+          description: Reset link generated
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Reset link generated
+                data: 89b235fd974068a679be32e50f646ee34419f191a266cb69d584c81e7392e2a7
+  /auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Reset user password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        "200":
+          description: Password updated successfully
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Password updated successfully
+        "400":
+          description: Invalid or expired token
+
+  # Vehicles
+
+  /vehicles:
+    post:
+      tags:
+        - Vehicles
+      summary: Create a vehicle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleRequest'
+      responses:
+        "201":
+          description: Vehicle created
+          content:
+            application/json:
+              example:
+                status: 201
+                message: Vehicle created
+        "400":
+          description: Validation error
+    get:
+      tags:
+        - Vehicles
+      summary: Get all vehicles
+      description: Returns all vehicles belonging to the authenticated customer.
+      responses:
+        "200":
+          description: Vehicles list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Vehicles list
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Vehicle'
+  /vehicles/{id}:
+    get:
+      tags:
+        - Vehicles
+      summary: Get vehicle by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 13
+      responses:
+        "200":
+          description: Vehicle data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Vehicle data
+                  data:
+                    $ref: '#/components/schemas/Vehicle'
+        "404":
+          description: Vehicle not found
+    put:
+      tags:
+        - Vehicles
+      summary: Update vehicle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 13
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleRequest'
+      responses:
+        "200":
+          description: Vehicle updated
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Vehicle updated
+        "404":
+          description: Vehicle not found
+    delete:
+      tags:
+        - Vehicles
+      summary: Delete vehicle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 13
+      responses:
+        "200":
+          description: Vehicle deleted
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Vehicle deleted
+        "404":
+          description: Vehicle not found
+
+  # Appointments
+
+  /appointments:
+    post:
+      tags:
+        - Appointments
+      summary: Create appointment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentRequest'
+      responses:
+        "201":
+          description: Appointment created
+          content:
+            application/json:
+              example:
+                status: 201
+                message: Appointment created
+        "400":
+          description: Validation error
+    get:
+      tags:
+        - Appointments
+      summary: Get all appointments
+      responses:
+        "200":
+          description: Appointments list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Appointments list
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Appointment'
+  /appointments/{id}:
+    patch:
+      tags:
+        - Appointments
+      summary: Update appointment status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 4
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentStatusRequest'
+      responses:
+        "200":
+          description: Status updated
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Status updated
+        "404":
+          description: Appointment not found
+
+  # Repair Orders
+
+  /repair-orders:
+    post:
+      tags:
+        - Repair Orders
+      summary: Create repair order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepairOrderRequest'
+      responses:
+        "201":
+          description: Repair order created
+          content:
+            application/json:
+              example:
+                status: 201
+                message: Repair order created
+    get:
+      tags:
+        - Repair Orders
+      summary: Get all repair orders
+      responses:
+        "200":
+          description: Repair orders list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Repair orders list
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RepairOrder'
+  /repair-orders/{id}:
+    get:
+      tags:
+        - Repair Orders
+      summary: Get repair order by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 2
+      responses:
+        "200":
+          description: Repair order data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Repair order data
+                  data:
+                    $ref: '#/components/schemas/RepairOrder'
+        "404":
+          description: Repair order not found
+    patch:
+      tags:
+        - Repair Orders
+      summary: Update repair order status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepairOrderStatusRequest'
+      responses:
+        "200":
+          description: Status updated
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Status updated
+        "404":
+          description: Repair order not found
+
+  # Employees
+
+  /employees:
+    post:
+      tags:
+        - Employees
+      summary: Create employee
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeRequest'
+      responses:
+        "201":
+          description: Employee created
+          content:
+            application/json:
+              example:
+                status: 201
+                message: Employee created
+    get:
+      tags:
+        - Employees
+      summary: Get all employees
+      responses:
+        "200":
+          description: Employees list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Employees list
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Employee'
+  /employees/{id}:
+    get:
+      tags:
+        - Employees
+      summary: Get employee by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Employee data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Employee data
+                  data:
+                    $ref: '#/components/schemas/Employee'
+        "404":
+          description: Employee not found
+    put:
+      tags:
+        - Employees
+      summary: Update employee
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeUpdateRequest'
+      responses:
+        "200":
+          description: Employee updated
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Employee updated
+        "404":
+          description: Employee not found
+    delete:
+      tags:
+        - Employees
+      summary: Delete employee
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 6
+      responses:
+        "200":
+          description: Employee deactivated
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Employee deactivated
+        "404":
+          description: Employee not found
+
+  # Parts
+
+  /parts:
+    post:
+      tags:
+        - Parts
+      summary: Create part
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartRequest'
+      responses:
+        "201":
+          description: Part created
+          content:
+            application/json:
+              example:
+                status: 201
+                message: Part created
+    get:
+      tags:
+        - Parts
+      summary: Get all parts
+      responses:
+        "200":
+          description: Parts list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Parts list
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Part'
+  /parts/{id}:
+    get:
+      tags:
+        - Parts
+      summary: Get part by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Part data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Part data
+                  data:
+                    $ref: '#/components/schemas/Part'
+        "404":
+          description: Part not found
+    put:
+      tags:
+        - Parts
+      summary: Update part
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PartRequest'
+      responses:
+        "200":
+          description: Part updated
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Part updated
+        "404":
+          description: Part not found
+    delete:
+      tags:
+        - Parts
+      summary: Delete part
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+      responses:
+        "200":
+          description: Part deleted
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Part deleted
+        "404":
+          description: Part not found
+
+  # Services
+
+  /services:
+    post:
+      tags:
+        - Services
+      summary: Create service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceRequest'
+      responses:
+        "201":
+          description: Service created
+          content:
+            application/json:
+              example:
+                status: 201
+                message: Service created
+    get:
+      tags:
+        - Services
+      summary: Get all services
+      responses:
+        "200":
+          description: Services list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Services list
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Service'
+  /services/{id}:
+    get:
+      tags:
+        - Services
+      summary: Get service by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        "200":
+          description: Service data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Service data
+                  data:
+                    $ref: '#/components/schemas/Service'
+        "404":
+          description: Service not found
+    put:
+      tags:
+        - Services
+      summary: Update service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceRequest'
+      responses:
+        "200":
+          description: Service updated
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Service updated
+        "404":
+          description: Service not found
+    delete:
+      tags:
+        - Services
+      summary: Delete service
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+      responses:
+        "200":
+          description: Service deleted
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Service deleted
+        "404":
+          description: Service not found
+
+  # Repair Order Parts
+
+  /repair-orders/{id}/parts:
+    post:
+      tags:
+        - Repair Order Parts
+      summary: Add part to repair order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepairOrderPartRequest'
+      responses:
+        "201":
+          description: Part added
+          content:
+            application/json:
+              example:
+                status: 201
+                message: Part added
+    get:
+      tags:
+        - Repair Order Parts
+      summary: Get parts assigned to a repair order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+      responses:
+        "200":
+          description: Repair order part data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Repair order part data
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RepairOrderPart'
+  /repair-orders/{id}/parts/{partId}:
+    delete:
+      tags:
+        - Repair Order Parts
+      summary: Remove part from repair order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+        - name: partId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 6
+      responses:
+        "200":
+          description: Part removed
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Part removed
+        "404":
+          description: Part assignment not found
+
+  # Repair Order Services
+
+  /repair-orders/{id}/services:
+    post:
+      tags:
+        - Repair Order Services
+      summary: Add service to repair order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RepairOrderServiceRequest'
+      responses:
+        "201":
+          description: Service added
+          content:
+            application/json:
+              example:
+                status: 201
+                message: Service added
+    get:
+      tags:
+        - Repair Order Services
+      summary: Get services assigned to a repair order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+      responses:
+        "200":
+          description: Repair order service data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Repair order service data
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RepairOrderService'
+  /repair-orders/{id}/services/{serviceId}:
+    delete:
+      tags:
+        - Repair Order Services
+      summary: Remove service from repair order
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 5
+        - name: serviceId
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 6
+      responses:
+        "200":
+          description: Service removed
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Service removed
+        "404":
+          description: Service assignment not found
+
+  # Invoices
+
+  /invoices:
+    post:
+      tags:
+        - Invoices
+      summary: Create invoice
+      description: Creates an invoice for a repair order. The total amount is calculated by the server from the repair order's labor cost, parts, and services, and returned in `data`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceRequest'
+      responses:
+        "201":
+          description: Invoice created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: Invoice created
+                  data:
+                    type: number
+                    format: float
+                    description: Total invoice amount.
+                    example: 705.88
+        "400":
+          description: Invalid request
+    get:
+      tags:
+        - Invoices
+      summary: Get all invoices
+      responses:
+        "200":
+          description: Invoices list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Invoices list
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Invoice'
+  /invoices/{id}:
+    get:
+      tags:
+        - Invoices
+      summary: Get invoice by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 4
+      responses:
+        "200":
+          description: Invoice data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Invoice data
+                  data:
+                    $ref: '#/components/schemas/Invoice'
+        "404":
+          description: Invoice not found
+    put:
+      tags:
+        - Invoices
+      summary: Update invoice status
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 4
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvoiceStatusRequest'
+      responses:
+        "200":
+          description: Invoice updated
+          content:
+            application/json:
+              example:
+                status: 200
+                message: Invoice updated
+        "404":
+          description: Invoice not found
