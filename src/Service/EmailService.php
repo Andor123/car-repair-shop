@@ -44,7 +44,6 @@ class EmailService {
                 </p>
             ";
             return $mail->send();
-
         } catch (Exception $e) {
             error_log(
                 $mail->ErrorInfo
